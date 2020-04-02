@@ -2,6 +2,7 @@ package http4s_zio_sttp.restclient
 
 import http4s_zio_sttp.{User, UserNotFound}
 import doobie.Transactor
+import io.circe
 import sttp.model._
 import sttp.client._
 import sttp.client.circe._
@@ -12,11 +13,17 @@ import zio._
 /** General REST client module for production using STTP */
 final class RestClientService(tnx: Transactor[Task]) extends RestClient.Service[User] {
 
-  override def get(uri: Uri): ZIO[SttpClient, Throwable, Response[User]] = {
+  override def get(uri: Uri) /*: ZIO[SttpClient, Throwable, Response[User]]*/ = {
     val request = basicRequest
       .get(uri)
       .response(asJson[User]) // needs import io.circe.generic.auto._
-    SttpClient.send(request)
+    val zio: ZIO[SttpClient, Throwable, Response[Either[ResponseError[circe.Error], User]]] = SttpClient.send(request)
+    zio.flatMap{ response =>
+      response.body match {
+        case Right(user) => ZIO.succeed(user)
+        case Left(error) => ZIO.fail(error)
+      }
+    }
   }
 
   override def create(user: User): Task[User] =
