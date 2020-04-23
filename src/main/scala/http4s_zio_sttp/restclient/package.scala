@@ -49,6 +49,8 @@ package object restclient {
     backend =>
       new RestClient.Service[A] {
 
+        //TODO Discuss if moving the base URI of the RestClient to the method makeRestClient is better.
+        //It would be less redundant. But for that we would need a key parameter for each method.
         override def get(uri: Uri): ZIO[Any, Throwable, A] = {
           val request: Request[Either[ResponseError[Error], A], Nothing] = basicRequest
             .get(uri)
@@ -85,7 +87,7 @@ package object restclient {
 
   def getUser(uri: Uri): RIO[RestClient[User], User] = RIO.accessM(_.get.get(uri))
 
-  def createUser(a: User): RIO[RestClient[User], User] = RIO.accessM(_.get.create(a))
+  def createUser(uri: Uri, a: User): RIO[RestClient[User], User] = RIO.accessM(_.get.post(uri, a))
 
   def deleteUser(id: Int): RIO[RestClient[User], Boolean] = RIO.accessM(_.get.delete(id))
 }

@@ -29,7 +29,7 @@ object Main extends App {
         api <- configuration.apiConfig
         httpApp = Router[AppTask](
           "/users" -> Api(s"${api.endpoint}/users").route
-        ).orNotFound
+        )//.orNotFound
 
         server <- ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
           BlazeServerBuilder[AppTask]
