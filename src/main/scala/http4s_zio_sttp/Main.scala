@@ -4,10 +4,12 @@ import cats.effect.ExitCode
 import http4s_zio_sttp.http.Api
 import http4s_zio_sttp.configuration.{ApiConfig, Configuration}
 import http4s_zio_sttp.persistence.{UserPersistence, UserPersistenceService}
+import http4s_zio_sttp.restclient.RestClient
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.middleware.CORS
+import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
 import zio._
 import zio.blocking.Blocking
 import zio.clock.Clock
@@ -29,7 +31,7 @@ object Main extends App {
         api <- configuration.apiConfig
         httpApp = Router[AppTask](
           "/users" -> Api(s"${api.endpoint}/users").route
-        )//.orNotFound
+        ).orNotFound
 
         server <- ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
           BlazeServerBuilder[AppTask]
@@ -41,7 +43,7 @@ object Main extends App {
         }
       } yield server
 
-    program.provideSomeLayer[ZEnv](Configuration.live ++ userPersistence).foldM(
+    program.provideSomeLayer[ZEnv](Configuration.live ++ userPersistence ++ RestClient.userLive ++ AsyncHttpClientZioBackend.layer).foldM(
       err => putStrLn(s"Execution failed with: $err") *> IO.succeed(1),
       _ => IO.succeed(0)
     )
