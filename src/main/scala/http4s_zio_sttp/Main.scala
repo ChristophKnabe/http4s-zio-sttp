@@ -41,7 +41,7 @@ object Main extends App {
         }
       } yield server
 
-    program.provideSomeLayer[ZEnv](Configuration.live ++ userPersistence)foldM(
+    program.provideSomeLayer[ZEnv](Configuration.live ++ userPersistence).foldM(
       err => putStrLn(s"Execution failed with: $err") *> IO.succeed(1),
       _ => IO.succeed(0)
     )
