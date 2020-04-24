@@ -1,9 +1,11 @@
 # ZIO with http4s and doobie
 
-This example is about how to use ZIO with http4s and doobie that are using cats-effect.
-ZIO has a separate module called: `zio-interop-cats`
+This is an example of calling a web service by STTP from an http4s web service.
+
+ZIO is used as the glue effects library in order to make http4s and STTP collaborate.
+As http4s and STTP that are using `cats-effect`, ZIO has a separate module called: `zio-interop-cats`
 which contains instances for the Cats Effect library, 
-and allows you to use ZIO with any libraries that rely on Cats Effect like in our case Http4s and Doobie.
+and allows you to use ZIO with any libraries that rely on Cats Effect like in our case http4s and STTP.
 
 The example that is built in this package is a simple application that enable us to create/read/delete a user in Database via HTTP calls:
 
@@ -38,5 +40,4 @@ object Main extends zio.App {
  def run(args: List[String]): ZIO[ZEnv, Nothing, Int] = ???
 }
 ```
-
-For more details checkout this blog post: [https://medium.com/@wiemzin/zio-with-http4s-and-doobie-952fba51d089]
+Credits for the starting point of this project to Wiem Zin: [https://medium.com/@wiemzin/zio-with-http4s-and-doobie-952fba51d089]

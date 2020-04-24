@@ -1,7 +1,11 @@
-# Example for a REST Server, which acts as a REST client.
-Techniques used are **http4s**, **STTP**, and **ZIO** as glue.
+# ZIO with http4s and STTP
 
-Derived from the [ZIO http4s Doobie Example](https://github.com/wi101/zio-examples/tree/master/src/main/scala/com/zio/examples/http4s_doobie)
+This is an example of calling a web service by STTP from an http4s web service.
+
+ZIO is used as the glue effects library in order to make http4s and STTP collaborate.
+As http4s and STTP that are using `cats-effect`, ZIO has a separate module called: `zio-interop-cats`
+which contains instances for the Cats Effect library, 
+and allows you to use ZIO with any libraries that rely on Cats Effect like in our case http4s and STTP.
 
 **Attention: Not yet compilable!**
 
