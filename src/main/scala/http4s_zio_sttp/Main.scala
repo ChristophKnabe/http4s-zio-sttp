@@ -43,8 +43,8 @@ object Main extends App {
         }
       } yield server
 
-    program.provideSomeLayer[ZEnv]{
-      Configuration.live ++ userPersistence //++ RestClient.userLive ++ AsyncHttpClientZioBackend.layer
+    program.provideCustomLayer{
+      Configuration.live ++ userPersistence ++ (AsyncHttpClientZioBackend.layer() >>> RestClient.userLive)
     }.foldM(
       err => putStrLn(s"Execution failed with: $err") *> IO.succeed(1),
       _ => IO.succeed(0)
