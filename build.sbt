@@ -1,11 +1,11 @@
 name := "http4s-zio-sttp"
 version := "0.1"
-scalaVersion := "2.12.10"
+scalaVersion := "2.12.11"
 
-val Http4sVersion = "0.21.1"
+val Http4sVersion = "0.21.4"
 val CirceVersion = "0.13.0"
 val sttpVersion = "2.0.7"
-val DoobieVersion = "0.8.8"
+val DoobieVersion = "0.9.0"
 val ZIOVersion = "1.0.0-RC18-2"
 val PureConfigVersion = "0.11.0"
 val H2Version = "1.4.199"
@@ -35,9 +35,10 @@ libraryDependencies ++= Seq(
   //h2
   "com.h2database" % "h2" % H2Version,
   // log4j
-  "org.slf4j" % "slf4j-log4j12" % "1.7.26"
+  "org.slf4j" % "slf4j-log4j12" % "1.7.30"
 )
 
 // for zio snapshot versions
-resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
-testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
+//resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+//testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
+testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
