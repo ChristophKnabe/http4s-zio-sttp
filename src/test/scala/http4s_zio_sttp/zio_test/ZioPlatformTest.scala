@@ -27,13 +27,14 @@ object ZioPlatformTest extends DefaultRunnableSpec {
         before <- nanoTime
       } yield assert(before)(equalTo(0L))
     },
+    //Following Example 1 of https://zio.dev/docs/howto/howto_test_effects#examples
     testM("TestClock adjust changes the test time (effect)") {
       import zio.clock.nanoTime
       for{
         before <- nanoTime
         _ <- TestClock.adjust(Duration.fromNanos(100000L))
         after <- nanoTime
-      } yield assert(after)(equalTo(before+100))
+      } yield assert(after)(equalTo(before+100000L)) // TODO fails unexpectedly with after being 0
     },
     /*,
       testM("create a user then get it ") {
