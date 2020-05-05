@@ -33,6 +33,7 @@ object ZioPlatformTest extends DefaultRunnableSpec {
       for{
         before <- nanoTime
         _ <- TestClock.adjust(Duration.fromNanos(100000L))
+        _ <- ZIO.sleep(Duration.fromNanos(100000L))
         after <- nanoTime
       } yield assert(after)(equalTo(before+100000L)) // TODO fails unexpectedly with after being 0
     },
