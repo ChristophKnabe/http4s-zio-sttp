@@ -5,7 +5,7 @@ import zio.clock.Clock
 import zio.duration.Duration
 import zio.test.Assertion._
 import zio.test._
-import zio.test.environment.{TestClock, TestEnvironment}
+import zio.test.environment.TestClock
 
 object ZioPlatformTest extends DefaultRunnableSpec {
 
@@ -35,7 +35,7 @@ object ZioPlatformTest extends DefaultRunnableSpec {
         _ <- TestClock.adjust(Duration.fromNanos(100000L))
         _ <- ZIO.sleep(Duration.fromNanos(100000L))
         after <- nanoTime
-      } yield assert(after)(equalTo(before+100000L)) // TODO fails unexpectedly with after being 0
+      } yield assert(after)(equalTo(before+100000L))
     },
     /*,
       testM("create a user then get it ") {
