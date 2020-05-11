@@ -5,6 +5,7 @@ scalaVersion := "2.12.11"
 val Http4sVersion = "0.21.4"
 val CirceVersion = "0.13.0"
 val sttpVersion = "2.0.7"
+val wiremockVersion = "2.21.0"
 val DoobieVersion = "0.9.0"
 val ZIOVersion = "1.0.0-RC18-2"
 val PureConfigVersion = "0.11.0"
@@ -35,7 +36,9 @@ libraryDependencies ++= Seq(
   //h2
   "com.h2database" % "h2" % H2Version,
   // log4j
-  "org.slf4j" % "slf4j-log4j12" % "1.7.30"
+  "org.slf4j" % "slf4j-log4j12" % "1.7.30",
+  //WireMock
+  "com.github.tomakehurst" % "wiremock" % wiremockVersion % "test"
 )
 
 // for zio snapshot versions

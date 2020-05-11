@@ -8,6 +8,8 @@ import zio.test.{ assertM, suite, testM, DefaultRunnableSpec }
 import zio.{ clock, console, random }
 
 // Taken from https://github.com/zio/zio/blob/master/examples/shared/src/test/scala/zio/examples/test/MockExampleSpec.scala
+// but corrected to work with ZIO 1.0 RC 18-2
+// This will fail some test cases, as it wants to show the usage of ZIO Test.
 object MockExampleSpec extends DefaultRunnableSpec {
 
   def spec = suite("suite with mocks")(

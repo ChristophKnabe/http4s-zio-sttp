@@ -3,18 +3,20 @@ package http4s_zio_sttp.zio_test
 import zio.ZIO
 import zio.clock.Clock
 import zio.duration.Duration
-import zio.test.Assertion._
+import zio.test.Assertion.{equalTo, isGreaterThan, isGreaterThanEqualTo}
 import zio.test._
 import zio.test.environment.TestClock
 
 object ZioPlatformTest extends DefaultRunnableSpec {
 
+  val squareNumber = 144
+
   def spec = suite("ZIO Test")(
-    test("sqrt(144) (pure)") {
-      assert(math.sqrt(144))(equalTo(12.0))
+    test(s"sqrt($squareNumber) (pure)") {
+      assert(math.sqrt(squareNumber))(equalTo(12.0))
     },
-    testM("sqrt(144) (effect))") {
-      assertM(ZIO.succeed(math.sqrt(144)))(equalTo(12.0))
+    testM(s"sqrt($squareNumber) (effect)") {
+      assertM(ZIO.succeed(math.sqrt(squareNumber)))(equalTo(12.0))
     },
     testM("live Clock.nanoTime greater zero (effect)") {
       import zio.clock.nanoTime
@@ -27,32 +29,17 @@ object ZioPlatformTest extends DefaultRunnableSpec {
         before <- nanoTime
       } yield assert(before)(equalTo(0L))
     },
-    //Following Example 1 of https://zio.dev/docs/howto/howto_test_effects#examples
+    //Following Example 1 of https://github.com/zio/zio/blob/master/docs/howto/test_effects.md#examples
     testM("TestClock adjust changes the test time (effect)") {
       import zio.clock.nanoTime
+      val nanos = 100000L
+      val duration = Duration.fromNanos(nanos)
       for{
         before <- nanoTime
-        _ <- TestClock.adjust(Duration.fromNanos(100000L))
-        _ <- ZIO.sleep(Duration.fromNanos(100000L))
+        _ <- TestClock.adjust(duration)
+        _ <- ZIO.sleep(duration)
         after <- nanoTime
-      } yield assert(after)(equalTo(before+100000L))
-    },
-    /*,
-      testM("create a user then get it ") {
-        for {
-          created <- createUser(User(14, "usr"))
-          user <- getUser(14)
-        } yield
-          assert(created)(equalTo(User(14, "usr"))) &&
-            assert(user)(equalTo(User(14, "usr")))
-      },
-      testM("delete user") {
-        for {
-          deleted <- deleteUser(14).either
-          notFound <- getUser(14).either
-        } yield
-          assert(deleted)(isRight(isTrue)) &&
-            assert(notFound)(isLeft(anything))
-      }*/
+      } yield assert(after)(isGreaterThanEqualTo(before+nanos))
+    }
   )
 }
