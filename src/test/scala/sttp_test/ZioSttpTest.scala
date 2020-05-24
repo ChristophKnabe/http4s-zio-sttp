@@ -7,19 +7,22 @@ import zio.test.Assertion.{equalTo, isGreaterThan, isGreaterThanEqualTo}
 import zio.test._
 import zio.test.environment.TestClock
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, configureFor, get, getRequestedFor, stubFor, urlEqualTo, verify}
+import http4s_zio_sttp.User
 import http4s_zio_sttp.restclient.RestClient
 import org.apache.http.HttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.junit.Assert.assertEquals
 import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
+import sttp.model.Uri
 
 object ZioSttpTest extends DefaultRunnableSpec {
 
   val squareNumber = 144
 
   val mockServerZIO = ZIO.effect{
-    new WireMockServer()
+    new WireMockServer(8080) //no HTTPS
   }
 
   def spec = suite("ZIO STTP Test")(
@@ -52,28 +55,20 @@ object ZioSttpTest extends DefaultRunnableSpec {
         after <- nanoTime
       } yield assert(after)(isGreaterThanEqualTo(before+nanos))
     },
-    testM(s"WireMock (effect)") {
+    testM(s"RestClient[User] by WireMock (effect)") {
       for{
-        mockServer <- mockServerZIO
+        mock <- mockServerZIO
         _ <- ZIO.effect {
-          mockServer.start()
-          configureFor("localhost", 8080)
-          stubFor(get(urlEqualTo("/myResource")).willReturn(aResponse.withBody("Here is your resource.")))
+          mock.start()
+          mock.stubFor(get(urlEqualTo("/users/1")).willReturn(aResponse.withBody(User(1, "Christoph").toString))) //TODO convert User to JSON
         }
-        x <- ZIO.accessM(userRestClient(_.get.getUser(5))
-        //TODO weiter vom WireMock-Beispiel übernehmen:
+        uri <- ZIO.fromEither(Uri.parse("http://localhost:8080/users/1"))
+        user <- ZIO.accessM[RestClient[User]](_.get.get(uri))
         _ <- ZIO.effect{
-          val request = new HttpGet("http://localhost:8080/baeldung")
-          val httpResponse = httpClient.execute(request)
-          val stringResponse = convertResponseToString(httpResponse)
-          verify(getRequestedFor(urlEqualTo(BAELDUNG_PATH)))
-          assertEquals("Welcome to Baeldung!", stringResponse)
-
-          mockServer.stop()
+          mock.verify(getRequestedFor(urlEqualTo("/users/1")))
+          mock.stop()
         }
-        _ <- ZIO.effect{(duration)}
-        after <- nanoTime
-      } yield assert(after)(isGreaterThanEqualTo(before+nanos))
-    }.provideLayer((AsyncHttpClientZioBackend.layer() >>> RestClient.userLive))
+      } yield assert(user)(equalTo(User(1, "Christoph")))
+    }.provideLayer(AsyncHttpClientZioBackend.layer() >>> RestClient.userLive)
   )
 }
