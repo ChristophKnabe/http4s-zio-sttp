@@ -56,7 +56,7 @@ object ZioSttpTest extends DefaultRunnableSpec {
       } yield assert(after)(isGreaterThanEqualTo(before+nanos))
     },
     testM(s"RestClient[User] by WireMock (effect)") {
-      for{
+      (for{
         mock <- mockServerZIO
         _ <- ZIO.effect {
           mock.start()
@@ -68,7 +68,7 @@ object ZioSttpTest extends DefaultRunnableSpec {
           mock.verify(getRequestedFor(urlEqualTo("/users/1")))
           mock.stop()
         }
-      } yield assert(user)(equalTo(User(1, "Christoph")))
-    }.provideLayer(AsyncHttpClientZioBackend.layer() >>> RestClient.userLive)
+      } yield assert(user)(equalTo(User(1, "Christoph")))).provideLayer(AsyncHttpClientZioBackend.layer() >>> RestClient.userLive)
+    }
   )
 }
